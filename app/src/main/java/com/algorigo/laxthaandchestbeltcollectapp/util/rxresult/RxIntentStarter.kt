@@ -16,11 +16,16 @@ class RxIntentStarter private constructor(
 
         if (rxIntentStarterFragment == null) {
             rxIntentStarterFragment = RxIntentStarterFragment()
+                .apply {
+                    setFragmentDetachedListener {
+                        throw RuntimeException("Fragment is detached.")
+                    }
+                }
 
             fragmentManager
                 .beginTransaction()
                 .add(rxIntentStarterFragment, TAG)
-                .commit()
+                .commitNow()
         }
 
         return rxIntentStarterFragment
@@ -29,6 +34,7 @@ class RxIntentStarter private constructor(
     private fun removeRxIntentStarterFragment(fragmentManager: FragmentManager) {
         val rxIntentStarterFragment = fragmentManager.findFragmentByTag(TAG) as RxIntentStarterFragment?
         if (rxIntentStarterFragment != null) {
+            rxIntentStarterFragment.setFragmentDetachedListener(null)
             fragmentManager
                 .beginTransaction()
                 .remove(rxIntentStarterFragment)
