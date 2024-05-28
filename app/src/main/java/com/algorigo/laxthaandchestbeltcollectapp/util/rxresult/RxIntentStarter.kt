@@ -7,27 +7,33 @@ import com.algorigo.laxthaandchestbeltcollectapp.util.rxresult.data.ActivityRequ
 import com.algorigo.laxthaandchestbeltcollectapp.util.rxresult.data.ActivityResult
 import io.reactivex.rxjava3.core.Observable
 
-class RxIntentStarter(
-    fragmentManager: FragmentManager
+class RxIntentStarter private constructor(
+    private val fragmentManager: FragmentManager
 ) {
-
-    private var rxIntentStarterFragment: RxIntentStarterFragment? = null
-
-    init {
-        rxIntentStarterFragment = getRxIntentStarterFragment(fragmentManager)
-    }
 
     private fun getRxIntentStarterFragment(fragmentManager: FragmentManager): RxIntentStarterFragment {
         var rxIntentStarterFragment = fragmentManager.findFragmentByTag(TAG) as RxIntentStarterFragment?
 
         if (rxIntentStarterFragment == null) {
             rxIntentStarterFragment = RxIntentStarterFragment()
+
             fragmentManager
                 .beginTransaction()
                 .add(rxIntentStarterFragment, TAG)
+                .commit()
+        }
+
+        return rxIntentStarterFragment
+    }
+
+    private fun removeRxIntentStarterFragment(fragmentManager: FragmentManager) {
+        val rxIntentStarterFragment = fragmentManager.findFragmentByTag(TAG) as RxIntentStarterFragment?
+        if (rxIntentStarterFragment != null) {
+            fragmentManager
+                .beginTransaction()
+                .remove(rxIntentStarterFragment)
                 .commitNow()
         }
-        return rxIntentStarterFragment
     }
 
     fun requestEachWithImmediateCancelSuccessful(vararg activityRequest: ActivityRequest): Observable<Boolean> {
@@ -85,16 +91,24 @@ class RxIntentStarter(
     }
 
     fun requestEach(vararg activityRequest: ActivityRequest): Observable<ActivityResult> {
+        var rxIntentStarterFragment: RxIntentStarterFragment? = null
         return Observable.fromIterable(activityRequest.toList())
             .concatMap { request ->
-                val rxIntentStarterFragment = checkNotNull(rxIntentStarterFragment) { "RxActivityResultsFragment must not be null." }
+                val fragment = checkNotNull(rxIntentStarterFragment) { "RxIntentStarterFragment is detached." }
                 if (request.intent.action != null && request.intent.action!!.lowercase().contains(ACTION_SETTINGS)) {
-                    rxIntentStarterFragment.startActivityGrantedObservable(request.intent) {
+                    fragment.startActivityGrantedObservable(request.intent) {
                         request.isGranted?.invoke() ?: false
                     }
                 } else {
-                    rxIntentStarterFragment.startActivityForResultObservable(request.intent)
+                    fragment.startActivityForResultObservable(request.intent)
                 }
+            }
+            .doOnSubscribe {
+                rxIntentStarterFragment = getRxIntentStarterFragment(fragmentManager)
+            }
+            .doFinally {
+                removeRxIntentStarterFragment(fragmentManager)
+                rxIntentStarterFragment = null
             }
     }
 
