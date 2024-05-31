@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.algorigo.rxintentstarter.callbacks.FragmentDetachedListener
 import com.algorigo.rxintentstarter.data.ActivityResult
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -13,10 +14,18 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 class RxIntentStarterFragment : Fragment() {
 
     private val requestSubjectMap = mutableMapOf<Int, PublishSubject<ActivityResult>>()
+    private var fragmentDetachedListener: FragmentDetachedListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        if (activity?.isFinishing == false) {
+            fragmentDetachedListener?.onFragmentDetached()
+        }
     }
 
     @Deprecated("Deprecated in Java")
@@ -76,6 +85,10 @@ class RxIntentStarterFragment : Fragment() {
             .doFinally {
                 removeSubject(intent)
             }
+    }
+
+    fun setFragmentDetachedListener(fragmentDetachedListener: FragmentDetachedListener?) {
+        this.fragmentDetachedListener = fragmentDetachedListener
     }
 
     private fun getSubject(intent: Intent): PublishSubject<ActivityResult>? {
