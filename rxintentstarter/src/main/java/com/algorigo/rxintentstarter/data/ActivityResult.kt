@@ -4,7 +4,7 @@ import android.content.Intent
 
 data class ActivityResult(
     val resultCode: Int,
-    val data: Intent?
+    val data: Intent? = null
 ) {
 
     fun isOk(): Boolean {
