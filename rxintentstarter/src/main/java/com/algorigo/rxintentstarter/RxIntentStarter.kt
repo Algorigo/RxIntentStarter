@@ -11,7 +11,7 @@ class RxIntentStarter private constructor(
     private val fragmentManager: FragmentManager
 ) {
 
-    private fun getRxIntentStarterFragment(fragmentManager: FragmentManager): RxIntentStarterFragment {
+    private fun getRxIntentStarterFragment(): RxIntentStarterFragment {
         var rxIntentStarterFragment = fragmentManager.findFragmentByTag(TAG) as RxIntentStarterFragment?
 
         if (rxIntentStarterFragment == null) {
@@ -31,7 +31,7 @@ class RxIntentStarter private constructor(
         return rxIntentStarterFragment
     }
 
-    private fun removeRxIntentStarterFragment(fragmentManager: FragmentManager) {
+    private fun removeRxIntentStarterFragment() {
         val rxIntentStarterFragment = fragmentManager.findFragmentByTag(TAG) as RxIntentStarterFragment?
         if (rxIntentStarterFragment != null) {
             rxIntentStarterFragment.setFragmentDetachedListener(null)
@@ -110,11 +110,11 @@ class RxIntentStarter private constructor(
                 }
             }
             .doOnSubscribe {
-                rxIntentStarterFragment = getRxIntentStarterFragment(fragmentManager)
+                rxIntentStarterFragment = getRxIntentStarterFragment()
             }
             .doFinally {
                 if (rxIntentStarterFragment?.isRequestInProgress() == false) {
-                    removeRxIntentStarterFragment(fragmentManager)
+                    removeRxIntentStarterFragment()
                 }
                 rxIntentStarterFragment = null
             }
