@@ -35,10 +35,11 @@ class RxIntentStarter private constructor(
         val rxIntentStarterFragment = fragmentManager.findFragmentByTag(TAG) as RxIntentStarterFragment?
         if (rxIntentStarterFragment != null) {
             rxIntentStarterFragment.setFragmentDetachedListener(null)
+
             fragmentManager
                 .beginTransaction()
                 .remove(rxIntentStarterFragment)
-                .commitNow()
+                .commit()
         }
     }
 
