@@ -124,7 +124,7 @@ class RxIntentStarter private constructor(
 
         private val TAG: String = RxIntentStarter::class.java.simpleName
 
-        private const val ACTION_SETTINGS = "settings"
+        private const val ACTION_SETTINGS = "android.settings"
 
         fun create(fragmentActivity: FragmentActivity): RxIntentStarter {
             return RxIntentStarter(fragmentActivity.supportFragmentManager)
