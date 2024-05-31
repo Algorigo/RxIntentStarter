@@ -91,6 +91,10 @@ class RxIntentStarterFragment : Fragment() {
         this.fragmentDetachedListener = fragmentDetachedListener
     }
 
+    fun isRequestInProgress(): Boolean {
+        return requestSubjectMap.isNotEmpty()
+    }
+
     private fun getSubject(intent: Intent): PublishSubject<ActivityResult>? {
         return requestSubjectMap[intent.hashCode()]
     }

@@ -113,7 +113,9 @@ class RxIntentStarter private constructor(
                 rxIntentStarterFragment = getRxIntentStarterFragment(fragmentManager)
             }
             .doFinally {
-                removeRxIntentStarterFragment(fragmentManager)
+                if (rxIntentStarterFragment?.isRequestInProgress() == false) {
+                    removeRxIntentStarterFragment(fragmentManager)
+                }
                 rxIntentStarterFragment = null
             }
     }
