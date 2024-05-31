@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "RxIntentStarter"
 include(":app")
- 
+include(":rxintentstarter")
