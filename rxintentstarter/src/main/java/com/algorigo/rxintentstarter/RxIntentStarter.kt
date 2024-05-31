@@ -85,23 +85,17 @@ class RxIntentStarter(
     }
 
     fun requestEach(vararg activityRequest: ActivityRequest): Observable<ActivityResult> {
-        return request(Observable.fromIterable(activityRequest.toList()))
-    }
-
-    private fun request(requestObservable: Observable<ActivityRequest>): Observable<ActivityResult> {
-        return requestObservable
-            .concatMap(::requestImpl)
-    }
-
-    private fun requestImpl(request: ActivityRequest): Observable<ActivityResult> {
-        val rxIntentStarterFragment = checkNotNull(rxIntentStarterFragment) { "RxActivityResultsFragment must not be null." }
-        return if (request.intent.action != null && request.intent.action!!.lowercase().contains(ACTION_SETTINGS)) {
-            rxIntentStarterFragment.startActivityGrantedObservable(request.intent) {
-                request.isGranted?.invoke() ?: false
+        return Observable.fromIterable(activityRequest.toList())
+            .concatMap { request ->
+                val rxIntentStarterFragment = checkNotNull(rxIntentStarterFragment) { "RxActivityResultsFragment must not be null." }
+                if (request.intent.action != null && request.intent.action!!.lowercase().contains(ACTION_SETTINGS)) {
+                    rxIntentStarterFragment.startActivityGrantedObservable(request.intent) {
+                        request.isGranted?.invoke() ?: false
+                    }
+                } else {
+                    rxIntentStarterFragment.startActivityForResultObservable(request.intent)
+                }
             }
-        } else {
-            rxIntentStarterFragment.startActivityForResultObservable(request.intent)
-        }
     }
 
     companion object {
