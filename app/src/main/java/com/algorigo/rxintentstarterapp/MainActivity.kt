@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
                             ActivityRequest(
                                 Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
                             ) {
-                                (this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter.isEnabled
+                                (this.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter?.isEnabled ?: false
                             },
                         )
                     } else {
@@ -202,13 +202,18 @@ class MainActivity : AppCompatActivity() {
     private fun bluetoothPermissions(): Array<String> {
         return if (Build.VERSION.SDK_INT >= 31) {
             arrayOf(
-                android.Manifest.permission.BLUETOOTH_CONNECT,
-                android.Manifest.permission.BLUETOOTH_SCAN,
-                android.Manifest.permission.BLUETOOTH_ADVERTISE
+                android.Manifest.permission.BLUETOOTH_CONNECT
             )
         } else {
-            arrayOf()
+            arrayOf(
+                android.Manifest.permission.BLUETOOTH,
+            )
         }
+    }
+
+    override fun onDestroy() {
+        compositeDisposable.clear()
+        super.onDestroy()
     }
 
     companion object {
